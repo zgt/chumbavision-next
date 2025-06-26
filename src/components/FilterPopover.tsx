@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface FilterPopoverProps {
@@ -19,6 +19,18 @@ export default function FilterPopover({
   align = "end"
 }: FilterPopoverProps) {
   const [inputValue, setInputValue] = useState(filterTag);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +65,12 @@ export default function FilterPopover({
           </svg>
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 bg-black/90 backdrop-blur-sm border-gray-800" align={align}>
+      <PopoverContent 
+        className="w-80 bg-black/90 backdrop-blur-sm border-gray-800" 
+        align={align}
+        side={isMobile ? "top" : "bottom"}
+        sideOffset={isMobile ? 20 : 4}
+      >
         <div className="space-y-4">
           <div>
             <h4 className="font-medium text-white mb-2">Filter by Tag</h4>
