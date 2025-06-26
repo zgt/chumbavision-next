@@ -36,17 +36,13 @@ export async function GET() {
       );
     }
 
-    const videoUrls = await utapi.getFileUrls(videoFiles.map(file => file.key));
-
-    if (!videoUrls || !videoUrls.data) {
-      throw new Error('Invalid response from UploadThing getFileUrls');
-    }
-
     // Map the files to our video format
-    const videos = videoFiles.map((file: UploadThingFile, index: number) => {
-      if (!videoUrls.data[index] || !videoUrls.data[index].url) {
-        throw new Error(`Missing URL for file ${file.key}`);
+    const videos = videoFiles.map((file: UploadThingFile) => {
+      const APP_ID = process.env.UPLOADTHING_APP_ID;
+      if (!APP_ID) {
+        throw new Error('UPLOADTHING_APP_ID is not defined in environment variables');
       }
+      const videoUrl = `https://${APP_ID}.ufs.sh/f/${file.key}`;
 
       // Extract platform from filename if available
       const getPlatformFromFilename = (filename: string): string => {
@@ -57,12 +53,13 @@ export async function GET() {
 
       const video = {
         id: file.key,
-        url: videoUrls.data[index].url,
+        url: videoUrl,
         source: getPlatformFromFilename(file.name),
         createdAt: new Date(file.uploadedAt).toISOString(),
+        uploadedAt: file.uploadedAt,
       };
       return video;
-    });
+    }).sort((a, b) => b.uploadedAt - a.uploadedAt);
 
     return NextResponse.json(
       videos,
