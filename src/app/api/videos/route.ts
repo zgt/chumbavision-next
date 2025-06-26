@@ -6,7 +6,7 @@ interface UploadThingFile {
   name: string;
   status: 'Deletion Pending' | 'Failed' | 'Uploaded' | 'Uploading';
   uploadedAt: number;
-  customId?: string;
+  customId: string | null;
 }
 
 export async function GET(request: Request) {
