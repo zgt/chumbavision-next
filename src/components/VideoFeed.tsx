@@ -9,7 +9,11 @@ interface Video {
   createdAt: string;
 }
 
-export default function VideoFeed() {
+interface VideoFeedProps {
+  filterTag?: string;
+}
+
+export default function VideoFeed({ filterTag }: VideoFeedProps) {
   const [videos, setVideos] = useState<Video[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -27,7 +31,8 @@ export default function VideoFeed() {
 
   const loadVideos = useCallback(async () => {
     try {
-      const response = await fetch("/api/videos");
+      const url = filterTag ? `/api/videos?tag=${encodeURIComponent(filterTag)}` : "/api/videos";
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -62,7 +67,7 @@ export default function VideoFeed() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filterTag]);
 
   const handleClick = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
