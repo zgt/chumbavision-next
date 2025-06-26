@@ -1,4 +1,5 @@
 import { utapi } from '@/server/uploadthing';
+import { UTFile } from 'uploadthing/server';
 
 export interface UploadResult {
   fileId: string;
@@ -12,7 +13,7 @@ export class VideoUploader {
   /**
    * Downloads a video from a URL and uploads it to UploadThing
    */
-  async uploadVideoFromUrl(videoUrl: string, originalUrl: string, videoBuffer?: Uint8Array): Promise<UploadResult> {
+  async uploadVideoFromUrl(videoUrl: string, originalUrl: string, videoBuffer?: Uint8Array, tags?: string): Promise<UploadResult> {
     try {
       console.log('Processing video upload:', {
         hasVideoBuffer: !!videoBuffer,
@@ -62,9 +63,11 @@ export class VideoUploader {
         console.log('Downloaded video from HTTP, size:', buffer.length);
       }
       
-      // Create a File object for UploadThing
-      const file = new File([buffer], this.generateFileName(originalUrl), {
+      // Create a UTFile object for UploadThing with customId for tags
+      const fileName = this.generateFileName(originalUrl);
+      const file = new UTFile([buffer], fileName, {
         type: 'video/mp4',
+        customId: tags || undefined,
       });
       
       console.log('Uploading to UploadThing, file size:', file.size);
@@ -106,10 +109,12 @@ export class VideoUploader {
   /**
    * Uploads a video buffer directly to UploadThing
    */
-  async uploadVideoBuffer(buffer: Uint8Array, originalUrl: string): Promise<UploadResult> {
+  async uploadVideoBuffer(buffer: Uint8Array, originalUrl: string, tags?: string): Promise<UploadResult> {
     try {
-      const file = new File([buffer], this.generateFileName(originalUrl), {
+      const fileName = this.generateFileName(originalUrl);
+      const file = new UTFile([buffer], fileName, {
         type: 'video/mp4',
+        customId: tags || undefined,
       });
       console.log('Uploading to UploadThing video buffer, file size:', file.size);
 

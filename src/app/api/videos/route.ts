@@ -6,10 +6,15 @@ interface UploadThingFile {
   name: string;
   status: 'Deletion Pending' | 'Failed' | 'Uploaded' | 'Uploading';
   uploadedAt: number;
+  customId?: string;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Parse query parameters for tag filtering
+    const { searchParams } = new URL(request.url);
+    const filterTag = searchParams.get('tag');
+    
     // Get all files from UploadThing
     const listFilesResponse = await utapi.listFiles();
 
@@ -19,12 +24,22 @@ export async function GET() {
 
     const { files } = listFilesResponse;
     
-    // Filter for video files and get their URLs
+    // Filter for video files and optionally by tag
     const videoFiles = files.filter((file: UploadThingFile) => {
       const isVideo = file.name.toLowerCase().endsWith('.mp4') || 
         file.name.toLowerCase().endsWith('.mov') ||
         file.name.toLowerCase().endsWith('.webm');
-      return isVideo;
+      
+      if (!isVideo) return false;
+      
+      // If filtering by tag, check if the tag exists in customId
+      if (filterTag) {
+        if (!file.customId) return false;
+        const tags = file.customId.toLowerCase().split(',').map(tag => tag.trim());
+        return tags.includes(filterTag.toLowerCase());
+      }
+      
+      return true;
     });
 
     if (videoFiles.length === 0) {
@@ -57,6 +72,7 @@ export async function GET() {
         source: getPlatformFromFilename(file.name),
         createdAt: new Date(file.uploadedAt).toISOString(),
         uploadedAt: file.uploadedAt,
+        tags: file.customId ? file.customId.split(',').map(tag => tag.trim()) : [],
       };
       return video;
     }).sort((a, b) => b.uploadedAt - a.uploadedAt);

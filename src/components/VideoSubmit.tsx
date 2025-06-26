@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 export default function VideoSubmit() {
   const [url, setUrl] = useState('');
+  const [tags, setTags] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -31,7 +32,7 @@ export default function VideoSubmit() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url, tags }),
       });
 
       if (!response.ok) {
@@ -40,6 +41,7 @@ export default function VideoSubmit() {
 
       setSuccess(true);
       setUrl('');
+      setTags('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -72,6 +74,31 @@ export default function VideoSubmit() {
         </div>
         <p className="mt-2 text-sm text-gray-400">
           Enter a TikTok or Instagram video URL
+        </p>
+      </div>
+
+      <div>
+        <label htmlFor="tags" className="block text-sm font-medium text-gray-200">
+          Tags (optional)
+        </label>
+        <div className="mt-2 relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            name="tags"
+            id="tags"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            className="block w-full pl-10 pr-3 py-3 text-sm md:text-base border border-gray-600 rounded-lg bg-white/5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+            placeholder="comedy, viral, trending"
+          />
+        </div>
+        <p className="mt-2 text-sm text-gray-400">
+          Add comma-separated tags to organize your videos
         </p>
       </div>
 

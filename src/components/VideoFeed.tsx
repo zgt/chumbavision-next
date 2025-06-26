@@ -109,13 +109,11 @@ export default function VideoFeed({ filterTag }: VideoFeedProps) {
 
     setIsTransitioning(true);
     setTransitionDirection("down");
+    setCurrentIndex((prev) => Math.min(prev + 1, videos.length - 1));
 
     setTimeout(() => {
-      setCurrentIndex((prev) => Math.min(prev + 1, videos.length - 1));
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 100);
-    }, 300);
+      setIsTransitioning(false);
+    }, 500);
   }, [isTransitioning, currentIndex, videos.length]);
 
   const goToPrevious = useCallback(() => {
@@ -123,13 +121,11 @@ export default function VideoFeed({ filterTag }: VideoFeedProps) {
 
     setIsTransitioning(true);
     setTransitionDirection("up");
+    setCurrentIndex((prev) => Math.max(prev - 1, 0));
 
     setTimeout(() => {
-      setCurrentIndex((prev) => Math.max(prev - 1, 0));
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 100);
-    }, 300);
+      setIsTransitioning(false);
+    }, 500);
   }, [isTransitioning, currentIndex]);
 
   const handleTouchEnd = useCallback(() => {
@@ -186,26 +182,18 @@ export default function VideoFeed({ filterTag }: VideoFeedProps) {
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     switch (event.key) {
       case "ArrowUp":
-      case "w":
-      case "W":
         event.preventDefault();
         goToPrevious();
         break;
       case "ArrowDown":
-      case "s":
-      case "S":
         event.preventDefault();
         goToNext();
         break;
       case "ArrowLeft":
-      case "a":
-      case "A":
         event.preventDefault();
         goToPrevious();
         break;
       case "ArrowRight":
-      case "d":
-      case "D":
         event.preventDefault();
         goToNext();
         break;
@@ -316,7 +304,7 @@ export default function VideoFeed({ filterTag }: VideoFeedProps) {
               return (
                 <div
                   key={video.id}
-                  className={`absolute inset-0 transition-all duration-500 ease-out ${translateClass} ${opacityClass}`}
+                  className={`absolute inset-0 transition-transform duration-500 ease-out ${translateClass} ${opacityClass}`}
                 >
                   <div className="relative w-full h-full bg-black rounded-lg overflow-hidden">
                     <video

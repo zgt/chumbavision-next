@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   const scraper = new VideoScraper();
   
   try {
-    const { url } = await request.json();
+    const { url, tags } = await request.json();
     console.log('Processing video submission for URL:', url);
     
     // Validate URL
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     // Upload video to UploadThing
     console.log('Uploading video to UploadThing...');
     const uploader = new VideoUploader();
-    const uploadResult = await uploader.uploadVideoFromUrl(videoMetadata.videoUrl, url, videoMetadata.videoBuffer);
+    const uploadResult = await uploader.uploadVideoFromUrl(videoMetadata.videoUrl, url, videoMetadata.videoBuffer, tags);
     
     console.log('Video uploaded successfully:', {
       fileId: uploadResult.fileId,
