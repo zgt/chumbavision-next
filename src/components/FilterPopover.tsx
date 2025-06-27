@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
@@ -21,6 +21,7 @@ export default function FilterPopover({
 }: FilterPopoverProps) {
   const [inputValue, setInputValue] = useState(filterTag);
   const [isMobile, setIsMobile] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -33,6 +34,10 @@ export default function FilterPopover({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+    setInputValue(filterTag);
+  }, [filterTag]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onFilterChange(inputValue);
@@ -43,35 +48,32 @@ export default function FilterPopover({
     onFilterChange('');
   };
 
-  const FilterButton = () => (
-    <button
-      className={`text-white hover:text-gray-300 transition-colors duration-200 ${className}`}
-      aria-label="Filter videos by tag"
+  const filterButtonContent = (
+    <svg
+      width={iconSize}
+      height={iconSize}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <svg
-        width={iconSize}
-        height={iconSize}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <line x1="4" x2="20" y1="9" y2="9"/>
-        <line x1="4" x2="20" y1="15" y2="15"/>
-        <line x1="10" x2="14" y1="3" y2="21"/>
-      </svg>
-    </button>
+      <line x1="4" x2="20" y1="9" y2="9"/>
+      <line x1="4" x2="20" y1="15" y2="15"/>
+      <line x1="10" x2="14" y1="3" y2="21"/>
+    </svg>
   );
 
-  const FilterForm = () => (
+  const FilterForm = ({ autoFocus = false }: { autoFocus?: boolean }) => (
     <form onSubmit={handleSubmit} className="space-y-3">
       <input
+        ref={inputRef}
         type="text"
         placeholder="Enter tag to filter..."
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+        autoFocus={autoFocus}
         className="w-full p-2 rounded-md bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-400"
       />
       <div className="flex gap-2">
@@ -96,7 +98,12 @@ export default function FilterPopover({
     return (
       <Sheet>
         <SheetTrigger asChild>
-          <FilterButton />
+          <button
+            className={`text-white hover:text-gray-300 transition-colors duration-200 ${className}`}
+            aria-label="Filter videos by tag"
+          >
+            {filterButtonContent}
+          </button>
         </SheetTrigger>
         <SheetContent 
           side="top" 
@@ -106,7 +113,7 @@ export default function FilterPopover({
             <SheetTitle className="text-white text-left">Filter by Tag</SheetTitle>
           </SheetHeader>
           <div className="px-4 pb-4">
-            <FilterForm />
+            <FilterForm autoFocus={true} />
             {filterTag && (
               <p className="text-sm text-gray-300 mt-2">
                 Current filter: <span className="text-gray-200">#{filterTag}</span>
@@ -121,7 +128,12 @@ export default function FilterPopover({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <FilterButton />
+        <button
+          className={`text-white hover:text-gray-300 transition-colors duration-200 ${className}`}
+          aria-label="Filter videos by tag"
+        >
+          {filterButtonContent}
+        </button>
       </PopoverTrigger>
       <PopoverContent 
         className="w-80 bg-black/90 backdrop-blur-sm border-gray-800" 
@@ -132,7 +144,7 @@ export default function FilterPopover({
         <div className="space-y-4">
           <div>
             <h4 className="font-medium text-white mb-2">Filter by Tag</h4>
-            <FilterForm />
+            <FilterForm autoFocus={true} />
             {filterTag && (
               <p className="text-sm text-gray-300 mt-2">
                 Current filter: <span className="text-gray-200">#{filterTag}</span>
